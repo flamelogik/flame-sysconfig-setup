@@ -7,6 +7,8 @@ A macOS app that walks you through building a central `sysconfig.cfg`, so every 
 
 ## What it does
 
+<img src="docs/images/main-window.png" alt="The main window, filled from a facility profile" width="600">
+
 Flame can read its shared folders, Matchbox/Lightbox/Pybox bins, configuration files (Batch, tags, colour coding, project templates…) and project defaults from one `sysconfig.cfg` on shared storage (see Flame Help, **"sysconfig.cfg"**). Writing that JSON by hand is error-prone, and one wrong path quietly sends a workstation back to its factory settings.
 
 Flame Sysconfig Setup gives every setting its own row, with a plain-English description, a folder picker and a found / not found check. Then it:
@@ -59,9 +61,18 @@ The app is written to `build/Flame Sysconfig Setup.app`. The release builds come
 1. **Set up your facility profile.** Click **Set Up…** in the Setup section (or Flame Sysconfig Setup → Facility Profile…, ⌘,).
    - Choose your **shared root**, the folder on shared storage where your facility keeps Flame's shared files, e.g. `/Volumes/YourShare/flame`.
    - Adjust where each item lives inside it. The suggested layout is `cfg`, `models`, `lightbox`, `matchbox/shaders`, `pybox` and `fonts`.
+
+   ![The facility profile editor](docs/images/facility-profile.png)
+
 2. **Fill Paths.** One click sets every path in the window from your profile.
 3. **Check the Configuration Files section.** Any `.cfg` missing from your config folder is listed. **Copy from This Mac** copies it from the workstation's `/opt/Autodesk/cfg`, or from Autodesk's sample.
-4. **Save.** Review anything the app flags, then confirm.
+
+   ![Configuration files found in the shared folder, with one missing](docs/images/configuration-files.png)
+
+4. **Save.** Review anything the app flags, then confirm. When you're replacing a file, the review shows each change.
+
+   ![Review before saving, with a missing file and two corrections](docs/images/review-before-saving.png)
+
 5. **Install Pointer on This Mac.** It needs an administrator password, and any existing file is backed up first.
 6. **Repeat step 5 on each workstation.** Mount the share at the same path everywhere. Export your profile (Facility Profile… → **Export…**) to import it on other Macs.
 7. **Restart Flame, then click Check Flame Log…** It should say Flame used your shared file, with every setting matching.

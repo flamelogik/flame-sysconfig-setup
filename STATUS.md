@@ -49,6 +49,7 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
   - Filling from a profile describing a real facility's layout reproduces that facility's live file exactly.
   - Pointer state detection and log parsing are correct.
   - Shell and AppleScript quoting handle `'` and `"` in paths.
+- README screenshots (`docs/images/`) were taken from a demo setup on a disk image mounted at `/Volumes/SHARED_LOCATION`, so they show no real facility paths.
 - On screen: main window, config-files checklist, missing-file rows and the override flow, pointer status, the Facility Profile row, and the icon.
 - Release: the v1.0.0 download from the release page passes its SHA-256 check, is universal (arm64 + x86_64), is ad-hoc signed, and reports version 1.0.0. A manual run of the workflow built an app that launched normally.
 
