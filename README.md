@@ -25,8 +25,10 @@ Only list combinations that have actually been tested.
 | Flame version | macOS | Rocky Linux | Notes |
 |---|---|---|---|
 | 2027.2 | ✅ | ❌ | Tested with 2027.2 prerelease builds on macOS 26 (Apple silicon) |
-| 2027, 2027.1 | ❔ | ❌ | |
-| 2025, 2026 | ❔ | ❌ | Settings added after the chosen version are left out automatically |
+| 2027.1 | ✅ | ❌ | |
+| 2027 | ✅ | ❌ | |
+| 2026 | ✅ | ❌ | Settings added after the chosen version are left out automatically |
+| 2025 | ✅ | ❌ | Settings added after the chosen version are left out automatically |
 
 ✅ tested and working · ⚠️ works with issues (see Known issues) · ❌ not working · ❔ untested
 
@@ -91,7 +93,7 @@ The app only changes files when you click **Save**, **Copy from This Mac** or **
 
 Bug reports, testing on other Flame versions, and pull requests are welcome. See the Logik [contributing guide](https://github.com/flamelogik/.github/blob/main/CONTRIBUTING.md).
 
-The most useful contribution right now is testing on Flame 2025, 2026 or an Intel Mac and reporting back so the compatibility table can be filled in.
+The most useful contribution right now is testing on an Intel Mac and reporting back.
 
 ## Credits and provenance
 

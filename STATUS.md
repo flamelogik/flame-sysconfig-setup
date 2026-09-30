@@ -4,7 +4,7 @@ _Last updated: 2026-09-30_
 
 ## Where things stand
 
-**Moving to `flamelogik/flame-sysconfig-setup` as the Logik org's first community repo, with v1.0.0 as the first public release.** The code is complete; facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. Every other feature has been confirmed working in daily use with Flame 2027.2.
+**Live at [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup), the Logik org's first community repo. v1.0.0 is the first public release.** The code is complete; facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. Every other feature has been confirmed working in daily use with Flame 2027.2.
 
 The repo meets the Logik repo standards: README template sections, MIT `LICENSE` (Logik community contributors), `CHANGELOG.md`, `.github/CODEOWNERS`, and no binaries. Releases are built by `.github/workflows/release.yml` when a `vX.Y.Z` tag is pushed.
 
@@ -46,8 +46,8 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
 
 ## Next steps
 
-1. **Check the release workflow's first run.** Run it by hand (Actions → Release → Run workflow) before tagging, then tag `v1.0.0` on `main` and move `[Unreleased]` in CHANGELOG.md to `[1.0.0] - <date>`.
-2. **Open starter issues** labeled `good first issue` / `help wanted` (MASTER_PLAN Phase 3), including "test on Flame 2025/2026 and report back", "test on an Intel Mac" and "add a screenshot to the README". Any screenshot must use a neutral demo profile, not a real facility's paths.
+1. **Publish v1.0.0.** After this release PR is merged, push the `v1.0.0` tag on `main`; the workflow publishes the Release. The workflow was verified by a manual run on 2026-09-30: the downloaded build passed its checksum, is universal and signed, and launches.
+2. **Open starter issues** labeled `good first issue` / `help wanted` (MASTER_PLAN Phase 3), including "test on an Intel Mac" and "add a screenshot to the README". Any screenshot must use a neutral demo profile, not a real facility's paths.
 3. **Test as a new user.** On a Mac with no saved preferences: the profile row should say "Not set up", **Set Up…** should open the editor with the suggested layout, and export → import on a second Mac should work.
 4. Check the Profile, Review and Check Flame Log windows by eye. They were verified through their data, not by clicking through them.
 5. **Later: notarization.** It needs an Apple Developer ID; until then the README explains how to open the app.
