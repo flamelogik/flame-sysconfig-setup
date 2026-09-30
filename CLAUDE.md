@@ -32,6 +32,7 @@ Autodesk's help page for `sysconfig.cfg` (Flame Help, "sysconfig.cfg") is the pr
 
 - There's no Xcode project: `build.sh` calls `swiftc -parse-as-library` on `Sources/*.swift` per architecture, then `lipo`, writes Info.plist, and ad-hoc signs. `VERSION` and `BUILD` come from the environment (the release workflow sets them from the tag). The bundle ID is `io.github.flamelogik.flame-sysconfig-setup`, which is also the UserDefaults domain.
 - **Signing happens in a temp dir.** Network volumes such as Avid NEXIS add extended attributes that `codesign` rejects ("resource fork, Finder information, or similar detritus"), even after `xattr -cr`. `build.sh` assembles and signs off the volume, then copies into `build/` with `ditto --norsrc --noextattr`.
+- `build.sh` must stay executable in git (`git update-index --chmod=+x build.sh`). Network volumes like NEXIS don't keep Unix permissions, so `core.fileMode` is false and a plain commit loses the flag; the release workflow then fails with "Permission denied".
 - The icon is generated when `Resources/AppIcon.icns` is missing. It's git-ignored (no binaries in the repo); delete it locally to redraw.
 - SourceKit shows "cannot find type" errors per file because it doesn't see the other sources. Ignore them; `build.sh` is the real check.
 
