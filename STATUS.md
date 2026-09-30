@@ -4,7 +4,14 @@ _Last updated: 2026-09-30_
 
 ## Where things stand
 
-**Live at [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup), the Logik org's first community repo. v1.0.0 is the first public release.** The code is complete; facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. Every other feature has been confirmed working in daily use with Flame 2027.2.
+**v1.0.0 is released** ([release page](https://github.com/flamelogik/flame-sysconfig-setup/releases/tag/v1.0.0), published 2026-09-30). This is the Logik org's first community repo, [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup). Facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. The app is marked as working with Flame 2025 to 2027.2 on macOS.
+
+Five starter issues are open ([#4–#8](https://github.com/flamelogik/flame-sysconfig-setup/issues)):
+- #4 test on an Intel Mac
+- #5 first-time-user walkthrough
+- #6 README screenshot
+- #7 signing and notarization
+- #8 a mixed macOS / Rocky Linux facility
 
 The repo meets the Logik repo standards: README template sections, MIT `LICENSE` (Logik community contributors), `CHANGELOG.md`, `.github/CODEOWNERS`, and no binaries. Releases are built by `.github/workflows/release.yml` when a `vX.Y.Z` tag is pushed.
 
@@ -43,14 +50,15 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
   - Pointer state detection and log parsing are correct.
   - Shell and AppleScript quoting handle `'` and `"` in paths.
 - On screen: main window, config-files checklist, missing-file rows and the override flow, pointer status, the Facility Profile row, and the icon.
+- Release: the v1.0.0 download from the release page passes its SHA-256 check, is universal (arm64 + x86_64), is ad-hoc signed, and reports version 1.0.0. A manual run of the workflow built an app that launched normally.
 
 ## Next steps
 
-1. **Publish v1.0.0.** After this release PR is merged, push the `v1.0.0` tag on `main`; the workflow publishes the Release. The workflow was verified by a manual run on 2026-09-30: the downloaded build passed its checksum, is universal and signed, and launches.
-2. **Open starter issues** labeled `good first issue` / `help wanted` (MASTER_PLAN Phase 3), including "test on an Intel Mac" and "add a screenshot to the README". Any screenshot must use a neutral demo profile, not a real facility's paths.
-3. **Test as a new user.** On a Mac with no saved preferences: the profile row should say "Not set up", **Set Up…** should open the editor with the suggested layout, and export → import on a second Mac should work.
-4. Check the Profile, Review and Check Flame Log windows by eye. They were verified through their data, not by clicking through them.
-5. **Later: notarization.** It needs an Apple Developer ID; until then the README explains how to open the app.
+1. **Respond to the starter issues** as testers report back, and update the README's compatibility table when a new combination is tested (e.g. Intel, #4).
+2. **Test as a new user.** On a Mac with no saved preferences: the profile row should say "Not set up", **Set Up…** should open the editor with the suggested layout, and export → import on a second Mac should work. Issue #5 asks the community for the same.
+3. Check the Profile, Review and Check Flame Log windows by eye. They were verified through their data, not by clicking through them.
+4. **Notarization** (#7) needs an Apple Developer ID; until then the README explains how to open the app.
+5. For the next release, follow **Releasing** in `CLAUDE.md`.
 
 ## Decisions locked in
 
