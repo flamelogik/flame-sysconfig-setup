@@ -6,12 +6,13 @@ _Last updated: 2026-09-30_
 
 **v1.0.0 is released** ([release page](https://github.com/flamelogik/flame-sysconfig-setup/releases/tag/v1.0.0), published 2026-09-30). This is the Logik org's first community repo, [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup). Facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. The app is marked as working with Flame 2025 to 2027.2 on macOS.
 
-Five starter issues are open ([#4–#8](https://github.com/flamelogik/flame-sysconfig-setup/issues)):
+Four starter issues are open ([issues](https://github.com/flamelogik/flame-sysconfig-setup/issues)):
 - #4 test on an Intel Mac
 - #5 first-time-user walkthrough
-- #6 README screenshot
 - #7 signing and notarization
 - #8 a mixed macOS / Rocky Linux facility
+
+#6 (README screenshots) was closed by PR #10, which added four screenshots to the README.
 
 The repo meets the Logik repo standards: README template sections, MIT `LICENSE` (Logik community contributors), `CHANGELOG.md`, `.github/CODEOWNERS`, and no binaries. Releases are built by `.github/workflows/release.yml` when a `vX.Y.Z` tag is pushed.
 
@@ -50,14 +51,14 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
   - Pointer state detection and log parsing are correct.
   - Shell and AppleScript quoting handle `'` and `"` in paths.
 - README screenshots (`docs/images/`) were taken from a demo setup on a disk image mounted at `/Volumes/SHARED_LOCATION`, so they show no real facility paths.
-- On screen: main window, config-files checklist, missing-file rows and the override flow, pointer status, the Facility Profile row, and the icon.
+- On screen: main window, config-files checklist, missing-file rows and the override flow, pointer status, the Facility Profile row and editor, the Review window (issues and diff), and the icon.
 - Release: the v1.0.0 download from the release page passes its SHA-256 check, is universal (arm64 + x86_64), is ad-hoc signed, and reports version 1.0.0. A manual run of the workflow built an app that launched normally.
 
 ## Next steps
 
 1. **Respond to the starter issues** as testers report back, and update the README's compatibility table when a new combination is tested (e.g. Intel, #4).
 2. **Test as a new user.** On a Mac with no saved preferences: the profile row should say "Not set up", **Set Up…** should open the editor with the suggested layout, and export → import on a second Mac should work. Issue #5 asks the community for the same.
-3. Check the Profile, Review and Check Flame Log windows by eye. They were verified through their data, not by clicking through them.
+3. Check the Check Flame Log window by eye. It was verified through its data; the Profile and Review windows have now been seen on screen (README screenshots).
 4. **Notarization** (#7) needs an Apple Developer ID; until then the README explains how to open the app.
 5. For the next release, follow **Releasing** in `CLAUDE.md`.
 
