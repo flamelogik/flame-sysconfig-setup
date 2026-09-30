@@ -47,7 +47,7 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
 ## Next steps
 
 1. **Publish v1.0.0.** After this release PR is merged, push the `v1.0.0` tag on `main`; the workflow publishes the Release. The workflow was verified by a manual run on 2026-09-30: the downloaded build passed its checksum, is universal and signed, and launches.
-2. **Open starter issues** labeled `good first issue` / `help wanted` (MASTER_PLAN Phase 3), including "test on Flame 2025/2026 and report back", "test on an Intel Mac" and "add a screenshot to the README". Any screenshot must use a neutral demo profile, not a real facility's paths.
+2. **Open starter issues** labeled `good first issue` / `help wanted` (MASTER_PLAN Phase 3), including "test on an Intel Mac" and "add a screenshot to the README". Any screenshot must use a neutral demo profile, not a real facility's paths.
 3. **Test as a new user.** On a Mac with no saved preferences: the profile row should say "Not set up", **Set Up…** should open the editor with the suggested layout, and export → import on a second Mac should work.
 4. Check the Profile, Review and Check Flame Log windows by eye. They were verified through their data, not by clicking through them.
 5. **Later: notarization.** It needs an Apple Developer ID; until then the README explains how to open the app.
