@@ -1,0 +1,46 @@
+# Builds the app on GitHub's macOS runners. Pushing a tag like v1.0.0 publishes
+# a GitHub Release with the zipped app and its SHA-256 checksum, so anyone can
+# check a download matches the public source. Manual runs just upload the build.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then VERSION="${GITHUB_REF_NAME#v}"; else VERSION="0.0.0"; fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          VERSION="$VERSION" BUILD="$GITHUB_RUN_NUMBER" ./build.sh
+
+      - name: Zip
+        run: |
+          ZIP="Flame-Sysconfig-Setup-$VERSION.zip"
+          ditto -c -k --keepParent "build/Flame Sysconfig Setup.app" "$ZIP"
+          shasum -a 256 "$ZIP" > "$ZIP.sha256"
+          echo "ZIP=$ZIP" >> "$GITHUB_ENV"
+
+      - name: Upload build (manual runs)
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Flame-Sysconfig-Setup
+          path: Flame-Sysconfig-Setup-*.zip*
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "$ZIP" "$ZIP.sha256" \
+            --verify-tag --generate-notes --title "Flame Sysconfig Setup $GITHUB_REF_NAME"
