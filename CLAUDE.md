@@ -91,6 +91,21 @@ The repo follows the Logik [repo standards](https://github.com/flamelogik/.githu
 3. **After it's merged and confirmed**, tag the merge commit with an annotated tag and push it: `git tag -a vX.Y.Z -m "Flame Sysconfig Setup X.Y.Z" <merge-sha> && git push origin vX.Y.Z`. The workflow builds the app and publishes the GitHub Release with `Flame-Sysconfig-Setup-X.Y.Z.zip`, its `.sha256`, and generated notes.
 4. **Check the published release** by downloading it with `gh release download vX.Y.Z` and repeating the checks in step 1.
 
+## Screenshots
+
+README images live in `docs/images/`. They must never show a real facility's paths, share names or hostnames. To retake them:
+
+1. **Back up the app's preferences:** `defaults export io.github.flamelogik.flame-sysconfig-setup backup.plist`. Quit the app first.
+2. **Create a demo share without an admin password.** Make a disk image and mount it:
+   - `hdiutil create -size 200m -fs APFS -volname SHARED_LOCATION -type SPARSE demo.sparseimage`
+   - `hdiutil attach -nobrowse demo.sparseimage`
+
+   It mounts at `/Volumes/SHARED_LOCATION`. Create the suggested layout inside it (`cfg`, `models`, `lightbox`, `matchbox/shaders`, `pybox`, `fonts`, plus the standard shared subfolders). Fill `cfg/` from Autodesk's `.cfg.sample` files. Their contents never appear on screen, and the image is never committed.
+3. **Generate the demo state with the app's own code** (a `-D TESTING` scratch build): a `FacilityProfile` named "Demo Facility" rooted at `/Volumes/SHARED_LOCATION`, then `fillFromProfile()`, then write `makeJSON()` to `cfg/sysconfig.cfg`. Write the profile and `lastSysconfigPath` into the app's defaults, so it opens in that state.
+4. **The pointer row reads this Mac's real `/opt/Autodesk/cfg/sysconfig.cfg`**, which shows the real share path. For the shot, temporarily make `pointerState` read a demo pointer file instead (e.g. via an environment variable passed with `open --env`), rebuild, and discard the change with `git checkout` straight afterwards. Never commit it.
+5. **Capture** with `screencapture -x -o -l<windowID>`. A sheet is captured together with the window behind it. Claude can't click or scroll here, so ask the user to scroll, open sheets and close them. Crop with Pillow to the relevant card or sheet, and re-save from pixel data so no metadata is kept. Keep each image under about 500 KB.
+6. **Restore everything:** quit the app, `git checkout` any temporary code, rebuild, re-import the preferences backup, and `hdiutil detach /Volumes/SHARED_LOCATION`.
+
 ## Conventions
 
 - Match the existing style: small focused files, `// MARK:` sections, doc comments only where the why isn't obvious.
