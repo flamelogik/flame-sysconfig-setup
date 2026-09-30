@@ -77,6 +77,19 @@ The repo follows the Logik [repo standards](https://github.com/flamelogik/.githu
 - **Keep the README's template sections**, and only mark a Flame version × OS as tested when it really was.
 - **Never commit binaries.** That includes the built app and the generated icon. Releases come from `.github/workflows/release.yml`: pushing a `vX.Y.Z` tag on `main` builds the app on a macOS runner and publishes a GitHub Release with the zip and its SHA-256. The org only allows GitHub-owned and verified actions, and the default token is read-only, so the workflow declares `contents: write`.
 - **No Autodesk-proprietary material, client media, secrets, or internal facility paths.**
+- **The user merges PRs** (as an owner, with the rules bypass). Before syncing, tagging, or anything else that depends on a merge, check `gh pr view N --json state` says `MERGED`. Run that as its own step, not chained with `&&`: the command succeeds even when the PR is still open, and syncing an unmerged PR once switched the working copy to a `main` without the app.
+
+## Releasing
+
+1. **Test the workflow first.** Run it by hand on `main` or the release branch: `gh workflow run release.yml --ref BRANCH`. Download the artifact (`gh run download RUN_ID`) and check it:
+   - `shasum -a 256 -c *.sha256`
+   - `lipo -archs` should show `x86_64 arm64`
+   - `codesign -v` should pass
+   - `CFBundleShortVersionString` should be the expected version (`0.0.0` for manual runs)
+   - the app should launch
+2. **Open a release PR** that moves `[Unreleased]` in `CHANGELOG.md` to `[X.Y.Z] - YYYY-MM-DD` and updates `STATUS.md`.
+3. **After it's merged and confirmed**, tag the merge commit with an annotated tag and push it: `git tag -a vX.Y.Z -m "Flame Sysconfig Setup X.Y.Z" <merge-sha> && git push origin vX.Y.Z`. The workflow builds the app and publishes the GitHub Release with `Flame-Sysconfig-Setup-X.Y.Z.zip`, its `.sha256`, and generated notes.
+4. **Check the published release** by downloading it with `gh release download vX.Y.Z` and repeating the checks in step 1.
 
 ## Conventions
 
