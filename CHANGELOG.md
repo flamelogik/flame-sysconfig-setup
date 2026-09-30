@@ -4,7 +4,9 @@ Notable changes to this project, newest first. Versions follow [semantic version
 
 ## [Unreleased]
 
-First public release, planned as v1.0.0.
+## [1.0.0] - 2026-09-30
+
+First public release.
 
 ### Added
 - One row per `sysconfig.cfg` setting, with a description, folder picker, found / not found status and reset to the Autodesk default.
