@@ -1,2 +1,2 @@
-# new-repo.sh replaces this with the repo's own maintainer team.
-* @flamelogik/owners
+# Code owners are requested for review on every PR.
+* @flamelogik/flame-sysconfig-setup-maintainers

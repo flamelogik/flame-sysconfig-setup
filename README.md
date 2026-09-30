@@ -1,9 +1,9 @@
-# TOOL_NAME
+# flame-sysconfig-setup
 
-ONE_LINE_DESCRIPTION
+macOS app that builds a shared sysconfig.cfg so every Flame workstation uses the same folders, node bins and config files
 
 **Status:** Maintained
-**Maintainer:** @MAINTAINER_HANDLE
+**Maintainer:** @BayleyBY
 
 <!-- Status options: Maintained · Seeking maintainer · Archived (reason, date) -->
 
