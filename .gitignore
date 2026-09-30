@@ -1,0 +1,41 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# --- OS / editors ---
+.DS_Store
+._*
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# --- Build output (binaries ship via GitHub Releases, never commits) ---
+build/
+dist/
+*.ofx
+*.ofx.bundle/
+*.so
+*.dylib
+*.dll
+*.o
+*.a
+
+# --- Media (never commit client or large media) ---
+*.mov
+*.mp4
+*.mxf
+*.exr
+*.dpx
+*.ari
+*.r3d
+*.braw
+*.wav
+
+# --- Secrets ---
+.env
+*.pem
+*.key
