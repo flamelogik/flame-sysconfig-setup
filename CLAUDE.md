@@ -93,12 +93,14 @@ The repo follows the Logik [repo standards](https://github.com/flamelogik/.githu
 3. **After it's merged and confirmed**, tag the merge commit with an annotated tag and push it: `git tag -a vX.Y.Z -m "Flame Sysconfig Setup X.Y.Z" <merge-sha> && git push origin vX.Y.Z`. The workflow builds the app and publishes the GitHub Release with `Flame-Sysconfig-Setup-X.Y.Z.zip`, its `.sha256`, and generated notes.
 4. **Check the published release** by downloading it with `gh release download vX.Y.Z` and repeating the checks in step 1.
 5. **Add the notarized disk image.** This is done on the maintainer's Mac, because the Developer ID certificate and notary credentials live in its keychain, not in the repo. The identity and profile names are in `CLAUDE.local.md`.
-   - Check out the tag, then build signed: `VERSION=X.Y.Z SIGN_IDENTITY="Developer ID Application: …" ./build.sh`
-   - Package and notarize: `NOTARY_PROFILE=<profile> ./package_dmg.sh`. Apple's queue can take from minutes to hours, so run it in the background.
-   - The script staples the app, rebuilds the image around it, and checks it with `stapler validate` and `spctl`. Then confirm the finished `.dmg`: mount it and run `spctl --assess --type execute -vvv` on the app inside.
-   - Upload after the user agrees: `gh release upload vX.Y.Z build/Flame-Sysconfig-Setup-X.Y.Z.dmg build/Flame-Sysconfig-Setup-X.Y.Z.dmg.sha256`.
+   - **Build from the tag.** Check that `git rev-parse HEAD` equals `git rev-parse 'vX.Y.Z^{commit}'` and `git status --porcelain` is empty. Then build signed: `VERSION=X.Y.Z SIGN_IDENTITY="Developer ID Application: …" ./build.sh`
+   - **Package and notarize:** `NOTARY_PROFILE=<profile> ./package_dmg.sh`. Apple's queue has taken from a few minutes to a couple of hours, so run it in the background. `xcrun notarytool history --keychain-profile <profile>` shows the status meanwhile. The script staples the app, rebuilds the image around it, checks it with `stapler validate` and `spctl`, and writes a `.sha256`.
+   - **Check it as a downloader would.** Copy the `.dmg` to a temp folder and mark it as downloaded: `xattr -w com.apple.quarantine "0083;$(printf %x $(date +%s));Safari;" FILE.dmg`. Mount it with `hdiutil attach -nobrowse -readonly`, `ditto` the app out, and run `spctl --assess --type execute -vvv` on that copy. It should say `accepted` and `source=Notarized Developer ID`. `xcrun stapler validate` should pass too. Opening that copy from a script won't start the app: macOS shows its one-time "downloaded from the Internet" prompt and waits for a click.
+   - **Upload after the user agrees:** `gh release upload vX.Y.Z build/Flame-Sysconfig-Setup-X.Y.Z.dmg build/Flame-Sysconfig-Setup-X.Y.Z.dmg.sha256`. Then download it back with `gh release download vX.Y.Z --pattern '*.dmg*'`, and check that its SHA-256 equals the local file's and that the app inside still passes `spctl`.
 
-   Notarization needs the hardened runtime. The app's `do shell script … with administrator privileges` (Install Pointer) works under it without extra entitlements. Never put the certificate, its password or notary credentials in the repo or in GitHub secrets without the user deciding that.
+   Notarization needs the hardened runtime. A test program signed the same way runs `do shell script` without extra entitlements. The app's own `do shell script … with administrator privileges` (Install Pointer) uses the same mechanism, but hasn't been run under the hardened runtime yet, so check `STATUS.md` before relying on it. Never put the certificate, its password or notary credentials in the repo or in GitHub secrets without the user deciding that.
+
+   A release that only changes docs doesn't need a trial notarization first. The trial for v1.0.1 was to prove the process.
 
 ## Screenshots
 
