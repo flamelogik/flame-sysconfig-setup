@@ -1,5 +1,7 @@
 #!/bin/bash
 # Builds "Flame Sysconfig Setup.app" (universal: Apple silicon + Intel, macOS 13+) into ./build
+#   SIGN_IDENTITY="Developer ID Application: …"  sign for distribution (hardened runtime + secure timestamp).
+#                                                Without it the app is ad-hoc signed: it runs, but other Macs warn.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -47,7 +49,12 @@ cat > "$APP/Contents/Info.plist" <<EOF
 </plist>
 EOF
 
-codesign --force --sign - "$APP"
+if [ -n "${SIGN_IDENTITY:-}" ]; then
+  codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY" "$APP"
+else
+  codesign --force --sign - "$APP"
+fi
+codesign --verify --strict "$APP"
 
 mkdir -p build
 rm -rf "build/$NAME.app"

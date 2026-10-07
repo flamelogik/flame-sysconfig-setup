@@ -4,6 +4,11 @@ Notable changes to this project, newest first. Versions follow [semantic version
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-07
+
+### Added
+- A signed and notarized disk image, `Flame-Sysconfig-Setup-<version>.dmg`, so the app opens on other Macs without the Gatekeeper warning. `build.sh` signs with a Developer ID when `SIGN_IDENTITY` is set, and the new `package_dmg.sh` builds, notarizes and staples the image.
+
 ### Fixed
 - **Pointer on This Mac** now understands pointers that use the `<OS>`, `<MAJOR>`, `<MINOR>` and `<VERSION>` tokens. It resolves them for each installed Flame version, shows which versions the pointer sends to the file being edited, and no longer offers to replace a pointer that already leads there.
 - **Load Existing…** on a pointer that uses tokens now names the files it leads to on this Mac, instead of showing the raw tokens.

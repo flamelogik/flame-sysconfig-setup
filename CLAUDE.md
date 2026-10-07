@@ -22,7 +22,8 @@ Autodesk's help page for `sysconfig.cfg` (Flame Help, "sysconfig.cfg") is the pr
 | `Sources/App.swift` | App entry point (wrapped in `#if !TESTING`) and the Facility Profile… menu command (⌘,). |
 | `Sources/Helpers.swift` | Path cleanup, JSON/shell/AppleScript quoting, file panels. |
 | `tools/make_icon.swift` | Draws the app icon (custom flame path plus SF Symbol gear) into `Resources/AppIcon.icns`. |
-| `build.sh` | Builds `build/Flame Sysconfig Setup.app` (universal arm64 + x86_64, macOS 13+). |
+| `build.sh` | Builds `build/Flame Sysconfig Setup.app` (universal arm64 + x86_64, macOS 13+). Ad-hoc signed unless `SIGN_IDENTITY` is set. |
+| `package_dmg.sh` | Packages the built app into `build/Flame-Sysconfig-Setup-<version>.dmg`, and notarizes and staples it when `NOTARY_PROFILE` is set. |
 
 ## Build and test
 
@@ -91,6 +92,13 @@ The repo follows the Logik [repo standards](https://github.com/flamelogik/.githu
 2. **Open a release PR** that moves `[Unreleased]` in `CHANGELOG.md` to `[X.Y.Z] - YYYY-MM-DD` and updates `STATUS.md`.
 3. **After it's merged and confirmed**, tag the merge commit with an annotated tag and push it: `git tag -a vX.Y.Z -m "Flame Sysconfig Setup X.Y.Z" <merge-sha> && git push origin vX.Y.Z`. The workflow builds the app and publishes the GitHub Release with `Flame-Sysconfig-Setup-X.Y.Z.zip`, its `.sha256`, and generated notes.
 4. **Check the published release** by downloading it with `gh release download vX.Y.Z` and repeating the checks in step 1.
+5. **Add the notarized disk image.** This is done on the maintainer's Mac, because the Developer ID certificate and notary credentials live in its keychain, not in the repo. The identity and profile names are in `CLAUDE.local.md`.
+   - Check out the tag, then build signed: `VERSION=X.Y.Z SIGN_IDENTITY="Developer ID Application: …" ./build.sh`
+   - Package and notarize: `NOTARY_PROFILE=<profile> ./package_dmg.sh`. Apple's queue can take from minutes to hours, so run it in the background.
+   - The script staples the app, rebuilds the image around it, and checks it with `stapler validate` and `spctl`. Then confirm the finished `.dmg`: mount it and run `spctl --assess --type execute -vvv` on the app inside.
+   - Upload after the user agrees: `gh release upload vX.Y.Z build/Flame-Sysconfig-Setup-X.Y.Z.dmg build/Flame-Sysconfig-Setup-X.Y.Z.dmg.sha256`.
+
+   Notarization needs the hardened runtime. The app's `do shell script … with administrator privileges` (Install Pointer) works under it without extra entitlements. Never put the certificate, its password or notary credentials in the repo or in GitHub secrets without the user deciding that.
 
 ## Screenshots
 

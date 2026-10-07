@@ -1,10 +1,10 @@
 # STATUS — Flame Sysconfig Setup
 
-_Last updated: 2026-09-30_
+_Last updated: 2026-10-07_
 
 ## Where things stand
 
-**v1.0.0 is released** ([release page](https://github.com/flamelogik/flame-sysconfig-setup/releases/tag/v1.0.0), published 2026-09-30). This is the Logik org's first community repo, [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup). Facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. The app is marked as working with Flame 2025 to 2027.2 on macOS.
+**v1.0.1 is the current release** ([releases](https://github.com/flamelogik/flame-sysconfig-setup/releases)). v1.0.0 was published 2026-09-30. v1.0.1 (2026-10-07) makes the app understand pointers that use the `<OS>`, `<MAJOR>`, `<MINOR>` and `<VERSION>` tokens, after a Logik forum user reported that `<OS>` resolves to lowercase `macos` / `linux`. This is the Logik org's first community repo, [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup). Facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. The app is marked as working with Flame 2025 to 2027.2 on macOS.
 
 Four starter issues are open ([issues](https://github.com/flamelogik/flame-sysconfig-setup/issues)):
 - #4 test on an Intel Mac
@@ -52,15 +52,16 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
   - Shell and AppleScript quoting handle `'` and `"` in paths.
 - README screenshots (`docs/images/`) were taken from a demo setup on a disk image mounted at `/Volumes/SHARED_LOCATION`, so they show no real facility paths.
 - On screen: main window, config-files checklist, missing-file rows and the override flow, pointer status, the Facility Profile row and editor, the Review window (issues and diff), and the icon.
+- Pointer tokens (v1.0.1): headless tests of 13 pointer cases, including the reported `…/<OS>/<MAJOR>/…` pointer against macOS, Linux and wrongly cased paths, plain pointers, literal version keys and no Flame installed. The new wording wasn't checked in the running app, because that needs a Mac whose pointer uses tokens.
+- Notarized disk image (v1.0.1): Apple accepted the submission. A copy marked as downloaded passed `spctl` as "Notarized Developer ID", its staple validates, and the signed app launches. Install Pointer's admin prompt wasn't exercised under the hardened runtime; a test program signed the same way ran `do shell script` without problems.
 - Release: the v1.0.0 download from the release page passes its SHA-256 check, is universal (arm64 + x86_64), is ad-hoc signed, and reports version 1.0.0. A manual run of the workflow built an app that launched normally.
 
 ## Next steps
 
-0. **Release v1.0.1** with the pointer-token fix (see `[Unreleased]` in the CHANGELOG), following **Releasing** in `CLAUDE.md`. The fix came from a forum report that `<OS>` resolves to lowercase `macos` / `linux`; the finding is also posted on issue #8.
 1. **Respond to the starter issues** as testers report back, and update the README's compatibility table when a new combination is tested (e.g. Intel, #4).
 2. **Test as a new user.** On a Mac with no saved preferences: the profile row should say "Not set up", **Set Up…** should open the editor with the suggested layout, and export → import on a second Mac should work. Issue #5 asks the community for the same.
 3. Check the Check Flame Log window by eye. It was verified through its data; the Profile and Review windows have now been seen on screen (README screenshots).
-4. **Notarization** (#7) needs an Apple Developer ID; until then the README explains how to open the app.
+4. **Notarization in GitHub Actions** (#7) is still open. From v1.0.1 a maintainer signs and notarizes a `.dmg` locally (`package_dmg.sh`) and attaches it to the release. Doing it in Actions would need the certificate stored as repo secrets, which is the owner's decision.
 5. For the next release, follow **Releasing** in `CLAUDE.md`.
 
 ## Decisions locked in
