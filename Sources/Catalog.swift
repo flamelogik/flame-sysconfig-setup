@@ -241,6 +241,12 @@ enum Discovery {
             .first { FileManager.default.fileExists(atPath: $0.path) }
     }
 
+    /// Version names of the Flames installed on this Mac, e.g. "2027.1" or "2027.2.pr250", oldest first.
+    /// These are what Flame substitutes for the `<VERSION>` token.
+    static func installedVersionNames(root: URL = cfgRoot) -> [String] {
+        versionDirs(root: root).map { String($0.0.lastPathComponent.dropFirst()) }
+    }
+
     /// Hidden per-version folders such as ".2027.1", oldest first (resolving symlinks like ".current").
     private static func versionDirs(root: URL) -> [(URL, FlameVersion)] {
         let names = (try? FileManager.default.contentsOfDirectory(atPath: root.path)) ?? []
@@ -248,5 +254,39 @@ enum Discovery {
             .filter { $0.hasPrefix(".") }
             .compactMap { name in FlameVersion(parsing: String(name.dropFirst())).map { (root.appendingPathComponent(name), $0) } }
             .sorted { ($0.1, $0.0.lastPathComponent) < ($1.1, $1.0.lastPathComponent) }
+    }
+}
+
+// MARK: - Tokens in the versions section
+
+/// Resolves the tokens Flame accepts in a sysconfig `versions` entry, for one Flame version on this Mac.
+enum VersionTokens {
+    /// What Flame substitutes for `<OS>`. It's lowercase ("macos" / "linux"), not "macOS" as the help says.
+    static let os = "macos"
+
+    static func hasTokens(_ s: String) -> Bool {
+        ["<VERSION>", "<MAJOR>", "<MINOR>", "<OS>"].contains { s.contains($0) }
+    }
+
+    static func resolve(_ s: String, version: String) -> String {
+        let parsed = FlameVersion(parsing: version)
+        return s
+            .replacingOccurrences(of: "<VERSION>", with: version)
+            .replacingOccurrences(of: "<MAJOR>", with: parsed.map { "\($0.major)" } ?? version)
+            .replacingOccurrences(of: "<MINOR>", with: parsed.map { "\($0.minor)" } ?? "0")
+            .replacingOccurrences(of: "<OS>", with: os)
+    }
+
+    /// The file a `versions` section sends this Flame version to, or nil if no entry matches it.
+    static func target(in versions: [String: String], for version: String) -> String? {
+        for (key, path) in versions.sorted(by: { $0.key < $1.key }) where resolve(key, version: version) == version {
+            return resolve(path, version: version)
+        }
+        return nil
+    }
+
+    /// "2027.2.pr250" → "2027.2", for display.
+    static func label(_ version: String) -> String {
+        FlameVersion(parsing: version)?.label ?? version
     }
 }

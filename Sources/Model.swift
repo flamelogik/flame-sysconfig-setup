@@ -29,6 +29,17 @@ enum PathStatus {
 
 enum PointerState: Equatable {
     case none, pointsHere, pointsElsewhere([String]), ownSettings, invalid
+    /// A pointer using tokens such as `<OS>` or `<MAJOR>` that resolves to this file for `versions`
+    /// (display labels). `others` are installed versions it sends to a different file.
+    case resolvesHere(raw: [String], versions: [String], others: [String])
+
+    /// Flame on this Mac already reads the file being edited, for at least one installed version.
+    var isInstalled: Bool {
+        switch self {
+        case .pointsHere, .resolvesHere: return true
+        default: return false
+        }
+    }
 }
 
 struct ReviewIssue: Identifiable {
@@ -290,9 +301,16 @@ final class ConfigModel: ObservableObject {
             throw ToolError("\(url.lastPathComponent) has no \"configuration\" section.")
         }
         guard let settings = config["settings"] as? [String: Any], !settings.isEmpty else {
-            let versions = (config["versions"] as? [String: Any])?.values.compactMap { $0 as? String } ?? []
-            if let target = versions.first {
-                throw ToolError("This file has no settings. It only redirects Flame to \(target). Load that file instead.")
+            let versions = ((config["versions"] as? [String: Any]) ?? [:]).compactMapValues { $0 as? String }
+            if let raw = versions.values.sorted().first {
+                // Show where the tokens lead on this Mac, so the user knows which file to open.
+                let resolved = Set(Discovery.installedVersionNames(root: cfgRoot)
+                    .compactMap { VersionTokens.target(in: versions, for: $0) }).sorted()
+                let destination = VersionTokens.hasTokens(raw) && !resolved.isEmpty
+                    ? "\(raw). On this Mac that's \(resolved.joined(separator: ", "))"
+                    : raw
+                let which = resolved.count > 1 ? "one of those files" : "that file"
+                throw ToolError("This file has no settings. It only redirects Flame to \(destination). Load \(which) instead.")
             }
             throw ToolError("\(url.lastPathComponent) has no \"settings\" section.")
         }
@@ -456,13 +474,43 @@ final class ConfigModel: ObservableObject {
     // MARK: Pointer
 
     func pointerState(for target: URL) -> PointerState {
-        guard let data = try? Data(contentsOf: Self.pointerURL) else { return .none }
+        Self.pointerState(pointerData: try? Data(contentsOf: Self.pointerURL), target: target,
+                          installed: Discovery.installedVersionNames(root: cfgRoot))
+    }
+
+    /// Works out what a pointer file does for each installed Flame version, resolving `<VERSION>`,
+    /// `<MAJOR>`, `<MINOR>` and `<OS>` the way Flame does.
+    static func pointerState(pointerData: Data?, target: URL, installed: [String]) -> PointerState {
+        guard let data = pointerData else { return .none }
         guard let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let config = root["configuration"] as? [String: Any] else { return .invalid }
         let settings = (config["settings"] as? [String: Any]) ?? [:]
         if !settings.isEmpty { return .ownSettings }
-        let targets = ((config["versions"] as? [String: Any]) ?? [:]).values.compactMap { $0 as? String }
-        return targets == [target.path] ? .pointsHere : .pointsElsewhere(targets)
+        let versions = ((config["versions"] as? [String: Any]) ?? [:]).compactMapValues { $0 as? String }
+        let raw = versions.values.sorted()
+
+        // Without an installed Flame to resolve version tokens against, fall back to comparing the paths as written.
+        guard !installed.isEmpty else {
+            let paths = raw.map { $0.replacingOccurrences(of: "<OS>", with: VersionTokens.os) }
+            return paths == [target.path] ? .pointsHere : .pointsElsewhere(raw)
+        }
+
+        let here = installed.filter { VersionTokens.target(in: versions, for: $0) == target.path }
+        if here.isEmpty {
+            guard raw.contains(where: VersionTokens.hasTokens) else { return .pointsElsewhere(raw) }
+            // Say where the tokens lead on this Mac, so it's clear what replacing the pointer would undo.
+            let resolved = Set(installed.compactMap { VersionTokens.target(in: versions, for: $0) }).sorted()
+            return .pointsElsewhere(raw.map { "\($0) (on this Mac: \(resolved.joined(separator: ", ")))" })
+        }
+        if here.count == installed.count && !raw.contains(where: VersionTokens.hasTokens) { return .pointsHere }
+        // Several builds of one release (e.g. prereleases) share a label, so list each label once.
+        func labels(_ names: [String]) -> [String] {
+            var seen = Set<String>()
+            return names.map(VersionTokens.label).filter { seen.insert($0).inserted }
+        }
+        let hereLabels = labels(here)
+        let otherLabels = labels(installed.filter { !here.contains($0) }).filter { !hereLabels.contains($0) }
+        return .resolvesHere(raw: raw, versions: hereLabels, others: otherLabels)
     }
 
     func pointerDescription(_ state: PointerState) -> String {
@@ -471,6 +519,12 @@ final class ConfigModel: ObservableObject {
         case .none: return "No \(p) yet, so Flame uses each version's own settings."
         case .pointsHere: return "\(p) points to this file, so Flame on this Mac uses it."
         case .pointsElsewhere(let t): return "\(p) points to \(t.joined(separator: ", "))."
+        case .resolvesHere(let raw, let versions, let others):
+            var text = "\(p) sends Flame \(versions.joined(separator: ", ")) to this file (it points to \(raw.joined(separator: ", ")))."
+            if !others.isEmpty {
+                text += " Flame \(others.joined(separator: ", ")) \(others.count == 1 ? "goes" : "go") to a different file."
+            }
+            return text
         case .ownSettings: return "\(p) has its own settings, so Flame on this Mac ignores the shared file."
         case .invalid: return "\(p) isn't valid JSON."
         }

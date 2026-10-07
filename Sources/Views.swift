@@ -180,7 +180,7 @@ struct ContentView: View {
         .alert("sysconfig.cfg Saved",
                isPresented: Binding(get: { saveResult != nil }, set: { if !$0 { saveResult = nil } }),
                presenting: saveResult) { result in
-            if model.pointerState(for: result.url) != .pointsHere {
+            if !model.pointerState(for: result.url).isInstalled {
                 Button("Install Pointer on This Mac…") { DispatchQueue.main.async(execute: startInstallPointer) }
             }
             Button("Copy Pointer Text") { copyToPasteboard(model.pointerJSON(to: result.url)) }
@@ -271,7 +271,7 @@ struct ContentView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
-            if hasTarget && state == .pointsHere {
+            if hasTarget && state.isInstalled {
                 Label("Installed", systemImage: "checkmark.circle.fill").foregroundStyle(.green).font(.caption)
             } else {
                 Button("Install Pointer…", action: startInstallPointer)
@@ -548,7 +548,7 @@ struct ContentView: View {
             return
         }
         let state = model.pointerState(for: target)
-        if state == .pointsHere {
+        if state.isInstalled {
             info = InfoAlert(title: "Already Installed", message: model.pointerDescription(state))
             return
         }
@@ -571,7 +571,7 @@ struct ContentView: View {
     private func savedMessage(_ result: SaveResult) -> String {
         var msg = "Saved to \(result.url.path)."
         if let backup = result.backup { msg += "\n\nThe previous file was backed up as \(backup.lastPathComponent)." }
-        if model.pointerState(for: result.url) == .pointsHere {
+        if model.pointerState(for: result.url).isInstalled {
             msg += "\n\nThis Mac already points to it. Restart Flame to pick up the changes, and install the same pointer on each other workstation."
         } else {
             msg += "\n\nEach Flame workstation needs a pointer at \(ConfigModel.pointerURL.path) that redirects Flame here. Use Install Pointer on This Mac, or Copy Pointer Text to create it by hand."

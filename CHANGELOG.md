@@ -4,6 +4,13 @@ Notable changes to this project, newest first. Versions follow [semantic version
 
 ## [Unreleased]
 
+### Fixed
+- **Pointer on This Mac** now understands pointers that use the `<OS>`, `<MAJOR>`, `<MINOR>` and `<VERSION>` tokens. It resolves them for each installed Flame version, shows which versions the pointer sends to the file being edited, and no longer offers to replace a pointer that already leads there.
+- **Load Existing…** on a pointer that uses tokens now names the files it leads to on this Mac, instead of showing the raw tokens.
+
+### Changed
+- README: documents per-platform and per-version files, and that `<OS>` resolves to lowercase `macos` / `linux`, not "macOS or Linux" as Flame Help says. Thanks to jarak08 on the Logik forum.
+
 ## [1.0.0] - 2026-09-30
 
 First public release.

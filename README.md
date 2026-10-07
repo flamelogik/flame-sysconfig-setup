@@ -34,7 +34,7 @@ Only list combinations that have actually been tested.
 
 ✅ tested and working · ⚠️ works with issues (see Known issues) · ❌ not working · ❔ untested
 
-The app itself needs **macOS 13 or later** (Apple silicon or Intel). It's a macOS app, so it doesn't run on Rocky Linux; the `sysconfig.cfg` it writes is plain JSON that Linux workstations can read too, but that hasn't been tested.
+The app itself needs **macOS 13 or later** (Apple silicon or Intel). It's a macOS app, so it doesn't run on Rocky Linux. A facility with both platforms can give each its own `sysconfig.cfg` using the `<OS>` token; see [Separate files per platform or Flame version](#separate-files-per-platform-or-flame-version).
 
 ## Installation
 
@@ -93,6 +93,31 @@ Already have a shared `sysconfig.cfg`? Use **Load Existing…** to open and edit
 
 The shared file points back to itself, so Flame uses its settings. Flame only reads `sysconfig.cfg` at launch, so restart Flame after saving.
 
+### Separate files per platform or Flame version
+
+A pointer can use tokens, so one pointer sends each platform or Flame version to its own file:
+
+```json
+{
+  "configuration": {
+    "versions": {
+      "<VERSION>": "/Volumes/YourShare/flame/cfg/<OS>/<MAJOR>/sysconfig.cfg"
+    }
+  }
+}
+```
+
+| Token | Becomes | Example |
+|---|---|---|
+| `<OS>` | the platform, **in lowercase** | `macos`, `linux` |
+| `<MAJOR>` | the major version | `2027` |
+| `<MINOR>` | the minor version | `1` |
+| `<VERSION>` | the full version | `2027.1` |
+
+Flame Help says `<OS>` becomes "macOS or Linux", but Flame really uses lowercase `macos` and `linux`. Name the folders that way, because Linux file systems are case-sensitive. With the pointer above, Flame 2027 on a Mac reads `…/cfg/macos/2027/sysconfig.cfg`, and Flame 2025 on Linux reads `…/cfg/linux/2025/sysconfig.cfg`.
+
+The app doesn't write a pointer like this for you, so create it by hand. It does understand one: the **Pointer on This Mac** row shows which installed Flame versions the pointer sends to the file you're editing, and it won't offer to replace a pointer that already leads there. Use **Load Existing…** to open the file for each platform and version in turn; if you open the pointer itself, the app tells you which files it leads to on this Mac.
+
 The app only changes files when you click **Save**, **Copy from This Mac** or **Install Pointer**, and it backs up anything it replaces with a timestamp.
 
 ## Known issues
@@ -109,6 +134,8 @@ The most useful contribution right now is testing on an Intel Mac and reporting 
 ## Credits and provenance
 
 Written by @BayleyBY for the Logik community, with help from Claude (Anthropic). All code is original to this repository. It uses only Apple's system frameworks (SwiftUI, AppKit), with no third-party code. The app icon is drawn by `tools/make_icon.swift`; its gear is Apple's SF Symbol `gearshape.fill`, rendered at build time.
+
+Thanks to jarak08 on the Logik forum for finding that the `<OS>` token is lowercase, and for the per-platform pointer layout.
 
 Not affiliated with or endorsed by Autodesk. Autodesk and Flame are trademarks of Autodesk, Inc.
 
