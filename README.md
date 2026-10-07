@@ -38,13 +38,15 @@ The app itself needs **macOS 13 or later** (Apple silicon or Intel). It's a macO
 
 ## Installation
 
-**Download:** get the latest `Flame-Sysconfig-Setup-<version>.zip` from [Releases](../../releases). Each release has a `.sha256` file for checking the download (`shasum -a 256 -c Flame-Sysconfig-Setup-<version>.zip.sha256`). Unzip it and move **Flame Sysconfig Setup** to `/Applications`.
+**Download:** get the latest `Flame-Sysconfig-Setup-<version>.dmg` from [Releases](../../releases). Open it and drag **Flame Sysconfig Setup** to **Applications**. The disk image is signed with an Apple Developer ID and notarized by Apple, so it opens like any other Mac app.
 
-The app isn't notarized, so macOS blocks it the first time. Right-click it and choose **Open**, or run:
+Each release also has a `.zip`, built by GitHub Actions straight from the tagged source, for anyone who wants to check a build against the public code. That copy isn't notarized, so macOS blocks it the first time. Right-click it and choose **Open**, or run:
 
 ```bash
 xattr -dr com.apple.quarantine "/Applications/Flame Sysconfig Setup.app"
 ```
+
+Every download has a `.sha256` file for checking it, e.g. `shasum -a 256 -c Flame-Sysconfig-Setup-<version>.dmg.sha256`.
 
 **Build from source:** you need the Xcode Command Line Tools (`xcode-select --install`).
 
@@ -54,7 +56,7 @@ cd flame-sysconfig-setup
 ./build.sh
 ```
 
-The app is written to `build/Flame Sysconfig Setup.app`. The release builds come from the same script, run by GitHub Actions (`.github/workflows/release.yml`).
+The app is written to `build/Flame Sysconfig Setup.app`. The release builds come from the same script: GitHub Actions runs it for the `.zip` (`.github/workflows/release.yml`), and a maintainer runs it with a Developer ID, then `package_dmg.sh`, for the notarized `.dmg`.
 
 ## Usage
 
@@ -122,7 +124,7 @@ The app only changes files when you click **Save**, **Copy from This Mac** or **
 
 ## Known issues
 
-- The app isn't signed with an Apple Developer ID or notarized, so macOS asks for confirmation the first time it opens (see Installation).
+- The `.zip` build from GitHub Actions isn't notarized, so macOS asks for confirmation the first time it opens (see Installation). The `.dmg` is notarized. It's signed and notarized on a maintainer's Mac rather than in GitHub Actions, because the signing certificate isn't stored in the repo.
 - If the shared storage isn't mounted when Flame starts, Flame silently falls back to its factory paths. That's Flame's behaviour, not the app's; **Check Flame Log…** shows when it happens.
 
 ## Contributing
