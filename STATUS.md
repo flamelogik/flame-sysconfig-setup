@@ -4,12 +4,12 @@ _Last updated: 2026-10-07_
 
 ## Where things stand
 
-**v1.0.1 is the current release** ([releases](https://github.com/flamelogik/flame-sysconfig-setup/releases)). v1.0.0 was published 2026-09-30. v1.0.1 (2026-10-07) makes the app understand pointers that use the `<OS>`, `<MAJOR>`, `<MINOR>` and `<VERSION>` tokens, after a Logik forum user reported that `<OS>` resolves to lowercase `macos` / `linux`. This is the Logik org's first community repo, [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup). Facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. The app is marked as working with Flame 2025 to 2027.2 on macOS.
+**v1.0.1 is the current release** ([release page](https://github.com/flamelogik/flame-sysconfig-setup/releases/tag/v1.0.1), published 2026-10-07). It has two downloads: a `.dmg` signed with a Developer ID and notarized by Apple, and the `.zip` built by GitHub Actions. v1.0.0 was published 2026-09-30. v1.0.1 makes the app understand pointers that use the `<OS>`, `<MAJOR>`, `<MINOR>` and `<VERSION>` tokens, after a Logik forum user reported that `<OS>` resolves to lowercase `macos` / `linux`. This is the Logik org's first community repo, [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup). Facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. The app is marked as working with Flame 2025 to 2027.2 on macOS.
 
 Four starter issues are open ([issues](https://github.com/flamelogik/flame-sysconfig-setup/issues)):
 - #4 test on an Intel Mac
 - #5 first-time-user walkthrough
-- #7 signing and notarization
+- #7 signing and notarization (the `.dmg` is now notarized locally; doing it in GitHub Actions is still open)
 - #8 a mixed macOS / Rocky Linux facility
 
 #6 (README screenshots) was closed by PR #10, which added four screenshots to the README.
@@ -53,19 +53,21 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
 - README screenshots (`docs/images/`) were taken from a demo setup on a disk image mounted at `/Volumes/SHARED_LOCATION`, so they show no real facility paths.
 - On screen: main window, config-files checklist, missing-file rows and the override flow, pointer status, the Facility Profile row and editor, the Review window (issues and diff), and the icon.
 - Pointer tokens (v1.0.1): headless tests of 13 pointer cases, including the reported `…/<OS>/<MAJOR>/…` pointer against macOS, Linux and wrongly cased paths, plain pointers, literal version keys and no Flame installed. The new wording wasn't checked in the running app, because that needs a Mac whose pointer uses tokens.
-- Notarized disk image (v1.0.1): Apple accepted the submission. A copy marked as downloaded passed `spctl` as "Notarized Developer ID", its staple validates, and the signed app launches. Install Pointer's admin prompt wasn't exercised under the hardened runtime; a test program signed the same way ran `do shell script` without problems.
+- Notarized disk image (v1.0.1): built from the `v1.0.1` tag with a clean working copy, and accepted by Apple. After uploading, the `.dmg` was downloaded back from the release page: it's identical to the local build, passes its checksum, and the app inside passes `spctl` as "Notarized Developer ID". A copy marked as downloaded and copied out of the image also passes, its staple validates, and the signed app launches. Install Pointer's admin prompt wasn't exercised under the hardened runtime; a test program signed the same way ran a plain `do shell script` without problems.
 - Release: the v1.0.0 download from the release page passes its SHA-256 check, is universal (arm64 + x86_64), is ad-hoc signed, and reports version 1.0.0. A manual run of the workflow built an app that launched normally.
 
 ## Next steps
 
-1. **Respond to the starter issues** as testers report back, and update the README's compatibility table when a new combination is tested (e.g. Intel, #4).
-2. **Test as a new user.** On a Mac with no saved preferences: the profile row should say "Not set up", **Set Up…** should open the editor with the suggested layout, and export → import on a second Mac should work. Issue #5 asks the community for the same.
-3. Check the Check Flame Log window by eye. It was verified through its data; the Profile and Review windows have now been seen on screen (README screenshots).
-4. **Notarization in GitHub Actions** (#7) is still open. From v1.0.1 a maintainer signs and notarizes a `.dmg` locally (`package_dmg.sh`) and attaches it to the release. Doing it in Actions would need the certificate stored as repo secrets, which is the owner's decision.
-5. For the next release, follow **Releasing** in `CLAUDE.md`.
+1. **Try Install Pointer once with the signed app** on a Mac that doesn't have a pointer yet. It's the one feature not exercised under the hardened runtime that notarization requires.
+2. **Respond to the starter issues** as testers report back, and update the README's compatibility table when a new combination is tested (e.g. Intel, #4).
+3. **Test as a new user.** On a Mac with no saved preferences: the profile row should say "Not set up", **Set Up…** should open the editor with the suggested layout, and export → import on a second Mac should work. Issue #5 asks the community for the same.
+4. Check the Check Flame Log window by eye. It was verified through its data; the Profile and Review windows have now been seen on screen (README screenshots).
+5. **Notarization in GitHub Actions** (#7) is still open. From v1.0.1 a maintainer signs and notarizes a `.dmg` locally (`package_dmg.sh`) and attaches it to the release. Doing it in Actions would need the certificate stored as repo secrets, which is the owner's decision.
+6. For the next release, follow **Releasing** in `CLAUDE.md`.
 
 ## Decisions locked in
 
+- **Each release has a notarized `.dmg`, built on the maintainer's Mac.** The Developer ID certificate and notary credentials stay in that Mac's keychain, not in the repo or GitHub secrets. The Actions-built `.zip` is kept alongside it, so there's still a build anyone can check against the tagged source. This is an exception to the org standard that releases are built by GitHub Actions.
 - **Public and facility-neutral.** Site details live only in the git-ignored `CLAUDE.local.md`. The private development history was not carried into the org repo, so no earlier facility details remain.
 - **Hosted in the Logik org** (`flamelogik`), following its repo standards: protected `main`, squash-merged PRs, MIT license, releases built by GitHub Actions with a SHA-256 checksum.
 - **Versions come from git tags.** The first public release is v1.0.0; "v1.1" and "v1.2" were private development builds.
