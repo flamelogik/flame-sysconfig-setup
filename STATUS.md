@@ -56,6 +56,7 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
 
 ## Next steps
 
+0. **Release v1.0.1** with the pointer-token fix (see `[Unreleased]` in the CHANGELOG), following **Releasing** in `CLAUDE.md`. The fix came from a forum report that `<OS>` resolves to lowercase `macos` / `linux`; the finding is also posted on issue #8.
 1. **Respond to the starter issues** as testers report back, and update the README's compatibility table when a new combination is tested (e.g. Intel, #4).
 2. **Test as a new user.** On a Mac with no saved preferences: the profile row should say "Not set up", **Set Up…** should open the editor with the suggested layout, and export → import on a second Mac should work. Issue #5 asks the community for the same.
 3. Check the Check Flame Log window by eye. It was verified through its data; the Profile and Review windows have now been seen on screen (README screenshots).
