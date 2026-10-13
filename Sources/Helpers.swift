@@ -64,17 +64,47 @@ func existingAncestor(of path: String) -> URL? {
     return nil
 }
 
+/// The path with every symlink resolved, as Foundation reports it (it also drops a leading /private).
+func canonicalPath(_ p: String) -> String {
+    URL(fileURLWithPath: cleanPath(p)).resolvingSymlinksInPath().path
+}
+
+/// Re-expresses `chosen` under the path the user typed, when both name the same place.
+///
+/// The open panel returns a folder's real location, so a folder reached through a link (for example
+/// /mnt/YourShare linked to /Volumes/YourShare) comes back as /Volumes/…. Walking up from `typed`,
+/// the first ancestor whose real location contains `chosen` gives the route back, and `chosen` is
+/// rewritten under it. Anything from the first token onward in `typed` is ignored. If nothing
+/// matches, `chosen` is returned unchanged.
+func preservingTypedPrefix(chosen: String, typed: String) -> String {
+    var prefix = cleanPath(typed)
+    if let r = prefix.range(of: "<") { prefix = cleanPath(String(prefix[..<r.lowerBound])) }
+    guard prefix.hasPrefix("/"), prefix != "/" else { return chosen }
+    let target = canonicalPath(chosen)
+    while prefix != "/" && !prefix.isEmpty {
+        let real = canonicalPath(prefix)
+        if target == real { return prefix }
+        if target.hasPrefix(real + "/") { return prefix + target.dropFirst(real.count) }
+        prefix = (prefix as NSString).deletingLastPathComponent
+    }
+    return chosen
+}
+
+/// Folder picker. With `keepTyped`, the result is written the way the user reached it rather than
+/// as the real location the panel reports; see `preservingTypedPrefix`.
 @MainActor
-func chooseFolder(message: String, startingAt path: String) -> String? {
+func chooseFolder(message: String, startingAt path: String, keepTyped: Bool = false) -> String? {
     let panel = NSOpenPanel()
     panel.canChooseDirectories = true
     panel.canChooseFiles = false
     panel.canCreateDirectories = true
     panel.allowsMultipleSelection = false
+    panel.resolvesAliases = !keepTyped
     panel.message = message
     panel.prompt = "Choose"
     panel.directoryURL = existingAncestor(of: path)
-    return panel.runModal() == .OK ? panel.url?.path : nil
+    guard panel.runModal() == .OK, let chosen = panel.url?.path else { return nil }
+    return keepTyped ? preservingTypedPrefix(chosen: chosen, typed: path) : chosen
 }
 
 @MainActor

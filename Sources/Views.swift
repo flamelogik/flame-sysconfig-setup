@@ -219,7 +219,7 @@ struct ContentView: View {
                 placeholder: model.profile.resolve(FacilityProfile.saveKey) ?? "/Volumes/YourShare/flame/cfg",
                 status: cleanPath(model.saveFolder).isEmpty ? nil : model.status(ofPath: model.saveFolder, kind: .folder),
                 choose: {
-                    if let p = chooseFolder(message: "Choose where sysconfig.cfg will be saved", startingAt: model.saveFolder) {
+                    if let p = chooseFolder(message: "Choose where sysconfig.cfg will be saved", startingAt: model.saveFolder, keepTyped: model.keepPathsAsTyped) {
                         model.saveFolder = p
                     }
                 })
@@ -228,6 +228,13 @@ struct ContentView: View {
                     ForEach(model.versions) { Text($0.label).tag($0) }
                 }
                 Text("Settings added in later releases are dimmed and left out of the file, so older versions don't see keys they don't recognise.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 4)
+            VStack(alignment: .leading, spacing: 4) {
+                Toggle("Keep paths as typed", isOn: $model.keepPathsAsTyped)
+                Text("Choose… normally writes a folder's real location, so a folder reached through a link (for example /mnt/YourShare linked to /Volumes/YourShare) comes out as /Volumes/…. Turn this on to write paths the way you typed or reached them, for workstations that mount the share somewhere this Mac doesn't. Review lists any path that leads elsewhere on this Mac.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -343,7 +350,7 @@ struct ContentView: View {
             placeholder: ConfigModel.defaultConfigFolder,
             status: model.status(ofPath: model.configFolder, kind: .folder),
             choose: {
-                if let p = chooseFolder(message: "Choose the folder that holds the .cfg files", startingAt: model.configFolder) {
+                if let p = chooseFolder(message: "Choose the folder that holds the .cfg files", startingAt: model.configFolder, keepTyped: model.keepPathsAsTyped) {
                     model.configFolder = p
                 }
             },
@@ -438,7 +445,7 @@ struct ContentView: View {
                         .labelsHidden()
                         .frame(maxWidth: .infinity)
                     Button("Choose…") {
-                        if let p = chooseFolder(message: "Choose the folder for shared/\(override.name)", startingAt: override.path) {
+                        if let p = chooseFolder(message: "Choose the folder for shared/\(override.name)", startingAt: override.path, keepTyped: model.keepPathsAsTyped) {
                             override.path = p
                         }
                     }
@@ -485,13 +492,13 @@ struct ContentView: View {
 
     private func choose(_ item: SettingItem) {
         guard let folder = chooseFolder(message: "Choose the folder for \(item.title)",
-                                        startingAt: model.outputValue(item)) else { return }
+                                        startingAt: model.outputValue(item), keepTyped: model.keepPathsAsTyped) else { return }
         model.values[item.id] = item.kind.path(inFolder: folder)
     }
 
     private func chooseConfigOverride(_ item: SettingItem) {
         guard let folder = chooseFolder(message: "Choose the folder that holds \(fileName(item))",
-                                        startingAt: model.outputValue(item)) else { return }
+                                        startingAt: model.outputValue(item), keepTyped: model.keepPathsAsTyped) else { return }
         let path = item.kind.path(inFolder: folder)
         model.configOverrides[item.id] = path == model.folderPath(item) ? nil : path
     }
@@ -603,7 +610,7 @@ struct ProfileSheet: View {
                                 .labelsHidden()
                                 .frame(maxWidth: .infinity)
                             Button("Choose…") {
-                                if let p = chooseFolder(message: "Choose your facility's shared root", startingAt: model.profile.sharedRoot) {
+                                if let p = chooseFolder(message: "Choose your facility's shared root", startingAt: model.profile.sharedRoot, keepTyped: model.keepPathsAsTyped) {
                                     model.profile.sharedRoot = p
                                 }
                             }

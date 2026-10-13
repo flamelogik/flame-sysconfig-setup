@@ -76,7 +76,7 @@ The app is written to `build/Flame Sysconfig Setup.app`. The release builds come
    ![Review before saving, with a missing file and two corrections](docs/images/review-before-saving.png)
 
 5. **Install Pointer on This Mac.** It needs an administrator password, and any existing file is backed up first.
-6. **Repeat step 5 on each workstation.** Mount the share at the same path everywhere. Export your profile (Facility Profile… → **Export…**) to import it on other Macs.
+6. **Repeat step 5 on each workstation.** Mount the share at the same path everywhere. If some workstations mount it somewhere else, see [One file for both macOS and Linux](#one-file-for-both-macos-and-linux). Export your profile (Facility Profile… → **Export…**) to import it on other Macs.
 7. **Restart Flame, then click Check Flame Log…** It should say Flame used your shared file, with every setting matching.
 
 Already have a shared `sysconfig.cfg`? Use **Load Existing…** to open and edit it.
@@ -138,7 +138,7 @@ Tested with one file read by Flame 2027.1 on macOS and Flame 2025.2.3 on Rocky L
 Two things to know:
 
 - **Generate the file for the oldest Flame version in the facility.** Choose it in the app's version picker. Settings newer than that version are left out, so an older Flame never sees a key it doesn't understand.
-- **Make the Linux side bend, not the Mac.** Mapping `/mnt` onto `/Volumes` on macOS doesn't help, because the app resolves symlinks before writing and the paths come out as `/Volumes/…` anyway.
+- **Or let the Mac bend, with Keep paths as typed.** By default, **Choose…** writes a folder's real location, so a folder reached through a link such as `/mnt/YourShare` linked to `/Volumes/YourShare` comes out as `/Volumes/…`. Turn on **Keep paths as typed** in the Setup section and the app writes paths the way you typed or reached them instead. Then a Mac with `/mnt/YourShare` linked to the share writes `/mnt/…` paths that are right on Linux as they are. Before saving, Review lists every path that leads somewhere else on this Mac, so you can see what the other workstations will need.
 
 Which layout to choose: one shared file is simpler when every workstation uses the same folders. Separate files per platform are better when the Linux boxes need different paths, or a different Flame version needs different settings.
 

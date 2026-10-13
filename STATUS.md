@@ -11,7 +11,7 @@ Three starter issues are open ([issues](https://github.com/flamelogik/flame-sysc
 - #5 first-time-user walkthrough
 - #7 signing and notarization (the `.dmg` is now notarized locally; doing it in GitHub Actions is still open)
 
-#8 (a mixed macOS / Rocky Linux facility) is answered: both layouts work. Per-platform files via a token pointer shipped in v1.0.1, and a community tester confirmed one shared file across both platforms with Flame logs. The README documents both. One finding became its own issue: the app resolves symlinks before writing paths, so a Mac can't be made to write Linux-style paths. #6 (README screenshots) was closed by PR #10, which added four screenshots to the README.
+#8 (a mixed macOS / Rocky Linux facility) is answered: both layouts work. Per-platform files via a token pointer shipped in v1.0.1, and a community tester confirmed one shared file across both platforms with Flame logs. The README documents both. One finding became #15: the folder picker reports a folder's real location, so a Mac couldn't be made to write Linux-style paths. That's addressed by the unreleased "Keep paths as typed" option, which is the next thing to release. #6 (README screenshots) was closed by PR #10, which added four screenshots to the README.
 
 The repo meets the Logik repo standards: README template sections, MIT `LICENSE` (Logik community contributors), `CHANGELOG.md`, `.github/CODEOWNERS`, and no binaries. Releases are built by `.github/workflows/release.yml` when a `vX.Y.Z` tag is pushed.
 
@@ -27,6 +27,7 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
 - One row per sysconfig path, each with a description, **Choose…**, a reset to the Autodesk default, and a found / not found / uses tokens status.
 - Save location picker. The saved file's versions entry points back to itself.
 - "Oldest Flame version" picker. Settings newer than that version are dimmed and left out of the file.
+- "Keep paths as typed" (unreleased, #15): writes paths the way they were typed or reached instead of the real location the folder picker reports, and Review lists any path that leads elsewhere on this Mac. For facilities whose Linux workstations mount the share at a different path.
 - **Configuration Files Folder:** one folder for all `.cfg` files. Files found there are shown as a checklist with **Override…**; missing or overridden files get full rows.
 - **Copy from This Mac / Copy All Missing** for missing `.cfg` files. Copies from `/opt/Autodesk/cfg`, else Autodesk's newest `.sample`; never overwrites.
 - Shared-folder subfolder overrides (e.g. only `python`).
