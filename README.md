@@ -34,7 +34,7 @@ Only list combinations that have actually been tested.
 
 ✅ tested and working · ⚠️ works with issues (see Known issues) · ❌ not working · ❔ untested
 
-The app itself needs **macOS 13 or later** (Apple silicon or Intel). It's a macOS app, so it doesn't run on Rocky Linux. A facility with both platforms can give each its own `sysconfig.cfg` using the `<OS>` token; see [Separate files per platform or Flame version](#separate-files-per-platform-or-flame-version).
+The app itself needs **macOS 13 or later** (Apple silicon or Intel). It's a macOS app, so it doesn't run on Rocky Linux. A facility with both platforms can share one file, or give each platform its own; see [One file for both macOS and Linux](#one-file-for-both-macos-and-linux) and [Separate files per platform or Flame version](#separate-files-per-platform-or-flame-version).
 
 ## Installation
 
@@ -122,6 +122,26 @@ The app doesn't write a pointer like this for you, so create it by hand. It does
 
 The app only changes files when you click **Save**, **Copy from This Mac** or **Install Pointer**, and it backs up anything it replaces with a timestamp.
 
+### One file for both macOS and Linux
+
+The other way to run a mixed facility is one shared `sysconfig.cfg` that every workstation reads, with the plain pointer the app installs. This works as long as the share is reachable at the **same path on both platforms**. macOS mounts shares under `/Volumes/…`, and the app writes paths that way, so make the Linux side match: either bind-mount the share there or symlink it.
+
+```bash
+# Rocky Linux, as root. Either one works.
+mkdir -p /Volumes/YourShare && mount --bind /mnt/YourShare /Volumes/YourShare
+# or
+ln -s /mnt/YourShare /Volumes/YourShare
+```
+
+Tested with one file read by Flame 2027.1 on macOS and Flame 2025.2.3 on Rocky Linux 8.7: Flame's log showed every setting resolving on both, and `<VERSION>` in the node-bin paths expanded to each platform's own Flame version. `realpath` answers differently for a bind mount and a symlink, and Flame doesn't mind either.
+
+Two things to know:
+
+- **Generate the file for the oldest Flame version in the facility.** Choose it in the app's version picker. Settings newer than that version are left out, so an older Flame never sees a key it doesn't understand.
+- **Make the Linux side bend, not the Mac.** Mapping `/mnt` onto `/Volumes` on macOS doesn't help, because the app resolves symlinks before writing and the paths come out as `/Volumes/…` anyway.
+
+Which layout to choose: one shared file is simpler when every workstation uses the same folders. Separate files per platform are better when the Linux boxes need different paths, or a different Flame version needs different settings.
+
 ## Known issues
 
 - The `.zip` build from GitHub Actions isn't notarized, so macOS asks for confirmation the first time it opens (see Installation). The `.dmg` is notarized. It's signed and notarized on a maintainer's Mac rather than in GitHub Actions, because the signing certificate isn't stored in the repo.
@@ -137,7 +157,7 @@ The most useful contribution right now is testing on an Intel Mac and reporting 
 
 Written by @BayleyBY for the Logik community, with help from Claude (Anthropic). All code is original to this repository. It uses only Apple's system frameworks (SwiftUI, AppKit), with no third-party code. The app icon is drawn by `tools/make_icon.swift`; its gear is Apple's SF Symbol `gearshape.fill`, rendered at build time.
 
-Thanks to jarak08 on the Logik forum for finding that the `<OS>` token is lowercase, and for the per-platform pointer layout.
+Thanks to jarak08 on the Logik forum for finding that the `<OS>` token is lowercase, and for the per-platform pointer layout, and to @jarak-lvly for testing one shared file across macOS and Rocky Linux with full Flame logs (#8).
 
 Not affiliated with or endorsed by Autodesk. Autodesk and Flame are trademarks of Autodesk, Inc.
 

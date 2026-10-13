@@ -4,6 +4,9 @@ Notable changes to this project, newest first. Versions follow [semantic version
 
 ## [Unreleased]
 
+### Changed
+- README: documents the second way to run a mixed macOS and Linux facility, one shared file with the share reachable at the same path on both platforms, with the bind-mount and symlink commands for Linux, the rule to generate the file for the oldest Flame version in use, and why the Mac side can't be the one that bends. Based on a tested report in #8; thanks to @jarak-lvly.
+
 ## [1.0.1] - 2026-10-07
 
 ### Added
