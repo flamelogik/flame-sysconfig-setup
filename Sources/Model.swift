@@ -82,6 +82,12 @@ final class ConfigModel: ObservableObject {
     @Published var profile = FacilityProfile.loadSaved() {
         didSet { profile.saveToDefaults() }
     }
+    /// Write paths the way they were typed or reached, not the real location the folder picker reports.
+    /// For facilities whose other workstations mount the share somewhere this Mac doesn't.
+    @Published var keepPathsAsTyped = UserDefaults.standard.bool(forKey: ConfigModel.keepTypedKey) {
+        didSet { UserDefaults.standard.set(keepPathsAsTyped, forKey: Self.keepTypedKey) }
+    }
+    private static let keepTypedKey = "keepPathsAsTyped"
     /// Set by the menu command to open the profile editor.
     @Published var showProfileEditor = false
 
@@ -419,6 +425,15 @@ final class ConfigModel: ObservableObject {
                 detail: "Flame tries to create missing folders at launch. Check these are spelled correctly.",
                 items: missing))
         }
+        if keepPathsAsTyped {
+            let linked = pathsThroughLinks()
+            if !linked.isEmpty {
+                issues.append(ReviewIssue(
+                    title: "Paths written through a link",
+                    detail: "On this Mac each of these leads somewhere else. Flame here follows the link. Other workstations need the written path to exist for them too, as a link or a mount.",
+                    items: linked))
+            }
+        }
 
         if let rootItem = allItems.first(where: { $0.id == "shared_folders.default" }) {
             let root = outputValue(rootItem)
@@ -438,6 +453,23 @@ final class ConfigModel: ObservableObject {
             }
         }
         return issues
+    }
+
+    /// Output paths that exist on this Mac but resolve to a different location, as "key: written → real".
+    func pathsThroughLinks() -> [String] {
+        var out: [String] = []
+        func check(_ label: String, _ raw: String) {
+            let v = cleanPath(raw)
+            guard v.hasPrefix("/"), !v.contains("<"), FileManager.default.fileExists(atPath: v) else { return }
+            let real = canonicalPath(v)
+            if real != v { out.append("\(label): \(v) → \(real)") }
+        }
+        check("save location", saveFolder)
+        for section in sections where section.key != "project_folders" {
+            for item in section.items where isIncluded(item) { check(item.key, outputValue(item)) }
+        }
+        for o in sharedOverrides { check("shared \(o.name)", o.path) }
+        return out
     }
 
     /// Differences between the file on disk and what would be saved; nil if there's no readable file.

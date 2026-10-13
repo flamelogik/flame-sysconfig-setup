@@ -4,6 +4,9 @@ Notable changes to this project, newest first. Versions follow [semantic version
 
 ## [Unreleased]
 
+### Added
+- **Keep paths as typed** (Setup section, off by default). **Choose…** normally writes a folder's real location, so a folder reached through a link comes out as `/Volumes/…`. With the option on, the path is written the way it was typed or reached, so a Mac can produce paths that are right for workstations that mount the share elsewhere, such as `/mnt/…` on Linux. The Review sheet then lists every path that leads somewhere else on this Mac. (#15)
+
 ### Changed
 - README: documents the second way to run a mixed macOS and Linux facility, one shared file with the share reachable at the same path on both platforms, with the bind-mount and symlink commands for Linux, the rule to generate the file for the oldest Flame version in use, and why the Mac side can't be the one that bends. Based on a tested report in #8; thanks to @jarak-lvly.
 
