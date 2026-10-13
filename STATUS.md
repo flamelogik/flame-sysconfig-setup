@@ -4,14 +4,14 @@ _Last updated: 2026-10-13_
 
 ## Where things stand
 
-**v1.0.1 is the current release** ([release page](https://github.com/flamelogik/flame-sysconfig-setup/releases/tag/v1.0.1), published 2026-10-07). It has two downloads: a `.dmg` signed with a Developer ID and notarized by Apple, and the `.zip` built by GitHub Actions. v1.0.0 was published 2026-09-30. v1.0.1 makes the app understand pointers that use the `<OS>`, `<MAJOR>`, `<MINOR>` and `<VERSION>` tokens, after a Logik forum user reported that `<OS>` resolves to lowercase `macos` / `linux`. This is the Logik org's first community repo, [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup). Facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. The app is marked as working with Flame 2025 to 2027.2 on macOS.
+**v1.1.0 is being released** (release PR 2026-10-13; the tag, the GitHub Actions `.zip` and the notarized `.dmg` follow). It adds **Keep paths as typed** (#15) and documents one shared file for a mixed macOS and Linux facility (#8). v1.0.1 ([release page](https://github.com/flamelogik/flame-sysconfig-setup/releases/tag/v1.0.1), published 2026-10-07) has two downloads: a `.dmg` signed with a Developer ID and notarized by Apple, and the `.zip` built by GitHub Actions. v1.0.0 was published 2026-09-30. v1.0.1 made the app understand pointers that use the `<OS>`, `<MAJOR>`, `<MINOR>` and `<VERSION>` tokens, after a Logik forum user reported that `<OS>` resolves to lowercase `macos` / `linux`. This is the Logik org's first community repo, [`flamelogik/flame-sysconfig-setup`](https://github.com/flamelogik/flame-sysconfig-setup). Facility profiles were the last feature added, and everything specific to the facility it was first built for has been removed. The app is marked as working with Flame 2025 to 2027.2 on macOS.
 
 Three starter issues are open ([issues](https://github.com/flamelogik/flame-sysconfig-setup/issues)):
 - #4 test on an Intel Mac
 - #5 first-time-user walkthrough
 - #7 signing and notarization (the `.dmg` is now notarized locally; doing it in GitHub Actions is still open)
 
-#8 (a mixed macOS / Rocky Linux facility) is answered: both layouts work. Per-platform files via a token pointer shipped in v1.0.1, and a community tester confirmed one shared file across both platforms with Flame logs. The README documents both. One finding became #15: the folder picker reports a folder's real location, so a Mac couldn't be made to write Linux-style paths. That's addressed by the unreleased "Keep paths as typed" option, which is the next thing to release. #6 (README screenshots) was closed by PR #10, which added four screenshots to the README.
+#8 (a mixed macOS / Rocky Linux facility) is answered: both layouts work. Per-platform files via a token pointer shipped in v1.0.1, and a community tester confirmed one shared file across both platforms with Flame logs. The README documents both. One finding became #15: the folder picker reports a folder's real location, so a Mac couldn't be made to write Linux-style paths. That's addressed by "Keep paths as typed" in v1.1.0. #6 (README screenshots) was closed by PR #10, which added four screenshots to the README.
 
 The repo meets the Logik repo standards: README template sections, MIT `LICENSE` (Logik community contributors), `CHANGELOG.md`, `.github/CODEOWNERS`, and no binaries. Releases are built by `.github/workflows/release.yml` when a `vX.Y.Z` tag is pushed.
 
@@ -27,7 +27,7 @@ Build locally with `./build.sh` → `build/Flame Sysconfig Setup.app` (universal
 - One row per sysconfig path, each with a description, **Choose…**, a reset to the Autodesk default, and a found / not found / uses tokens status.
 - Save location picker. The saved file's versions entry points back to itself.
 - "Oldest Flame version" picker. Settings newer than that version are dimmed and left out of the file.
-- "Keep paths as typed" (unreleased, #15): writes paths the way they were typed or reached instead of the real location the folder picker reports, and Review lists any path that leads elsewhere on this Mac. For facilities whose Linux workstations mount the share at a different path.
+- "Keep paths as typed" (v1.1.0, #15): writes paths the way they were typed or reached instead of the real location the folder picker reports, and Review lists any path that leads elsewhere on this Mac. For facilities whose Linux workstations mount the share at a different path.
 - **Configuration Files Folder:** one folder for all `.cfg` files. Files found there are shown as a checklist with **Override…**; missing or overridden files get full rows.
 - **Copy from This Mac / Copy All Missing** for missing `.cfg` files. Copies from `/opt/Autodesk/cfg`, else Autodesk's newest `.sample`; never overwrites.
 - Shared-folder subfolder overrides (e.g. only `python`).

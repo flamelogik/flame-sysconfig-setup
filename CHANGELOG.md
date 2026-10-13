@@ -4,6 +4,8 @@ Notable changes to this project, newest first. Versions follow [semantic version
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-13
+
 ### Added
 - **Keep paths as typed** (Setup section, off by default). **Choose…** normally writes a folder's real location, so a folder reached through a link comes out as `/Volumes/…`. With the option on, the path is written the way it was typed or reached, so a Mac can produce paths that are right for workstations that mount the share elsewhere, such as `/mnt/…` on Linux. The Review sheet then lists every path that leads somewhere else on this Mac. (#15)
 
